@@ -1,9 +1,8 @@
 from flask import render_template, Flask, url_for, flash, redirect
-from forms import RegistrationForm, LoginForm
 
-app = Flask(__name__)
-
-app.config['SECRET_KEY'] = 'fba677308863bd0e0466508e56bc2fd7'
+from .models import User, Post
+from .forms import RegistrationForm, LoginForm
+from . import app
 
 posts = [
   {
