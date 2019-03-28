@@ -2,7 +2,7 @@ from flask import render_template, Flask, url_for, flash, redirect
 
 from .models import User, Post
 from .forms import RegistrationForm, LoginForm
-from . import app
+from . import app, db, bcrypt
 
 posts = [
   {
@@ -19,7 +19,6 @@ posts = [
   }
 ]
 
-
 @app.route("/")
 @app.route("/home")
 def home():
@@ -33,8 +32,13 @@ def about():
 def register():
   form = RegistrationForm()
   if form.validate_on_submit():
-    flash(f"Account created for {form.username.data}!", 'success')
-    return redirect(url_for('home'))
+    hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+    user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+    db.session.add(user)
+    db.session.commit()
+    # flash(f"Account created for {form.username.data}!", 'success')
+    flash(f"Your Account has been created! You are now logged in!", 'success')
+    return redirect(url_for('login'))
   return render_template('register.html', title="Register",
             form=form)
 
@@ -50,9 +54,4 @@ def login():
   return render_template('login.html', title="Login",
             form=form)
 
-
-
-
-if __name__ == "__main__":
-  app.run(debug=True)
 
